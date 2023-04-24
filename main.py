@@ -72,6 +72,8 @@ def levenshtein(seq1, seq2):
                     leven_matrix[x-1,y-1] + 1,
                     leven_matrix[x,y-1] + 1
                 )
+            y+=1
+        x+=1
 
     return (leven_matrix[xdim - 1, ydim-1])
 
