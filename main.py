@@ -46,7 +46,7 @@ def levenshtein(seq1, seq2):
     '''
     xdim = len(seq1) + 1
     ydim = len(seq2) + 1
-    leven_matrix = np.zeros(xdim, ydim)
+    leven_matrix = np.zeros((xdim, ydim))
     x=0
     while x< xdim:
         leven_matrix[x, 0]=x
