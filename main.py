@@ -4,8 +4,6 @@ from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 import numpy as np
 
-import unittest
-
 
 def parseArgs(argv):
     '''parse out Command line options.'''
@@ -40,6 +38,43 @@ def parseArgs(argv):
     except Exception as e:
         print(e)
         
+
+
+def levenshtein(seq1, seq2):
+    '''
+    simple implementation of levenshtein distance calculation
+    '''
+    xdim = len(seq1) + 1
+    ydim = len(seq2) + 1
+    leven_matrix = np.zeros(xdim, ydim)
+    x=0
+    while x< xdim:
+        leven_matrix[x, 0]=x
+        x+=1
+    y=0
+    while y< ydim:
+        leven_matrix[0, y]=y
+        y+=1
+
+    x=0
+    while x< xdim:
+        y=0
+        while y < ydim:
+            if seq1[x-1] == seq2[y-1]:
+                leven_matrix [x,y] = min(
+                    leven_matrix[x-1, y] + 1,
+                    leven_matrix[x-1, y-1],
+                    leven_matrix[x, y-1] + 1
+                )
+            else:
+                leven_matrix [x,y] = min(
+                    leven_matrix[x-1,y] + 1,
+                    leven_matrix[x-1,y-1] + 1,
+                    leven_matrix[x,y-1] + 1
+                )
+
+    return (leven_matrix[xdim - 1, ydim-1])
+
         
 
 def generateDistanceMatrix():
@@ -123,23 +158,23 @@ def testPlot(DistMatrix):
     weights = pd.DataFrame(DistMatrix).reset_index().melt('index').values.tolist()
     tuples = [tuple(w) for w in weights]
     
-    #E = [('A', 'B', 2), ('A', 'C', 1), ('B', 'D', 5), ('B', 'E', 3), ('C', 'B', 2)]
     G.add_weighted_edges_from(tuples)
     pos=nx.spring_layout(G)
 
     edge_weight = nx.get_edge_attributes(G,'weight')
-    #d = dict(G.degree)
-    #nx.draw(G, nodelist=d.keys(), node_size=[v * 100 for v in d.values()])
-    #nx.draw(G, nodelist=d.keys(), node_size=[1,2,3,4])
     d = nx.degree(G)
-    #nx.draw(G, pos, with_labels=True, font_weight='bold', node_size=[100,200,300,400])
-    nx.draw(G, pos, with_labels=True, font_weight='bold', node_size=[v * 100 for v in dict(d).values()])
+    node_adjacencies = []
+    node_text = []
+    for adjacencies in enumerate(G.adjacency()):
+        node_adjacencies.append(len(adjacencies[1]))
+        node_text.append('# of connections: '+str(len(adjacencies[1])))
+
+
+    nx.draw(G, pos, with_labels=True, font_weight='bold', node_size=[v * 100 for v in dict(d).values()], node_color=node_adjacencies)
     
     nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_weight)
+
     plt.show()
-    
-
-
 
 
 def main(argv=None): 
@@ -150,10 +185,13 @@ def main(argv=None):
     
     # parse_args to get filename
     parseArgs(argv)
+    
     # load fasta file
     readFastaFile(fastaFile)
+    
     # generate Levenshtein distance matrix
     ldDistMat = generateDistanceMatrix()
+    
     # make a pretty plot
     testPlot(ldDistMat)
     
