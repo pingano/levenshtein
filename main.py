@@ -56,15 +56,16 @@ def levenshtein(seq1, seq2):
         leven_matrix[0, y]=y
         y+=1
 
-    x=0
+    x=1
     while x< xdim:
-        y=0
+        y=1
         while y < ydim:
+            print(seq1[x-1] + "|" + seq2[y-1])
             if seq1[x-1] == seq2[y-1]:
                 leven_matrix [x,y] = min(
-                    leven_matrix[x-1, y] + 1,
+                    leven_matrix[x-1, y] ,
                     leven_matrix[x-1, y-1],
-                    leven_matrix[x, y-1] + 1
+                    leven_matrix[x, y-1] 
                 )
             else:
                 leven_matrix [x,y] = min(
@@ -184,7 +185,10 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
         
-    
+    seq1='AAAAA'
+    seq2='AAAAT'
+    levenshtein(seq1, seq2)
+    exit(0)
     # parse_args to get filename
     parseArgs(argv)
     
