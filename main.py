@@ -87,7 +87,7 @@ def generateDistanceMatrix():
     '''
     
     ldDistMatrix = np.zeros((len(sequenceLines),len(sequenceLines)))
-    
+
     i=0
     j=0
     
@@ -144,7 +144,7 @@ def readFastaFile(filename):
     headerLines.append(headerLine)
     sequenceLines.append(sequence)   
          
-    print("loaded <" + str(s-1) + "> sequences")
+    print("loaded <" + str(len(headerLines)) + "> sequences")
     
     return len(headerLines)
 
@@ -160,6 +160,11 @@ def testPlot(DistMatrix):
     G=nx.from_numpy_matrix(DistMatrix)
     weights = pd.DataFrame(DistMatrix).reset_index().melt('index').values.tolist()
     tuples = [tuple(w) for w in weights]
+    filteredTuples = []
+    for t in tuples:
+        if t[2]!=0.0:
+            filteredTuples.append(t)
+    
     
     G.add_weighted_edges_from(tuples)
     pos=nx.spring_layout(G)
@@ -178,6 +183,8 @@ def testPlot(DistMatrix):
     nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_weight)
 
     plt.show()
+    
+    print("done")
 
 
 def main(argv=None): 
@@ -185,10 +192,6 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
         
-    seq1='AAAAA'
-    seq2='AAAAT'
-    levenshtein(seq1, seq2)
-    exit(0)
     # parse_args to get filename
     parseArgs(argv)
     
